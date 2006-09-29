@@ -1,3 +1,10 @@
 2006-09-29  Al Riddoch  <alriddoch@zepler.org>
 
+	* eris_account.h, eris_account.cpp: Start work on bindings for
+	  Eris::Account.
+
+	* eris_connection.cpp: Add methods to connection as required.
+
+2006-09-29  Al Riddoch  <alriddoch@zepler.org>
+
 	* New package to wrap various WorldForge libraries for Python

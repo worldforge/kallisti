@@ -15,19 +15,19 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-#include "eris_connection.h"
+#include "eris_account.h"
 
-#include <Eris/Connection.h>
+#include <Eris/Account.h>
 
-static PyObject * ErisConnection_connect(PyErisConnection * self)
+static PyObject * ErisAccount_login(PyErisAccount * self)
 {
-    if (self->connection == 0) {
+    if (self->account == 0) {
         PyErr_SetString(PyExc_AssertionError,
-                        "NULL connection in eris.Connection.connect");
+                        "NULL account in eris.Account.login");
         return NULL;
     }
 
-    if (self->connection->connect() != 0) {
+    if (self->account->login() != 0) {
         PyErr_SetString(PyExc_IOError,
                         "Unable to create socket");
         return NULL;
@@ -37,17 +37,17 @@ static PyObject * ErisConnection_connect(PyErisConnection * self)
     return Py_None;
 }
 
-static PyObject * ErisConnection_disconnect(PyErisConnection * self)
+static PyObject * ErisAccount_createAccount(PyErisAccount * self)
 {
-    if (self->connection == 0) {
+    if (self->account == 0) {
         PyErr_SetString(PyExc_AssertionError,
-                        "NULL connection in eris.Connection.disconnect");
+                        "NULL account in eris.Account.createAccount");
         return NULL;
     }
 
-    if (self->connection->disconnect() != 0) {
+    if (self->account->createAccount() != 0) {
         PyErr_SetString(PyExc_IOError,
-                        "Unable to disconnect");
+                        "Unable to createAccount");
         return NULL;
     }
 
@@ -55,80 +55,92 @@ static PyObject * ErisConnection_disconnect(PyErisConnection * self)
     return Py_None;
 }
 
-static PyObject * ErisConnection_send(PyErisConnection * self)
+static PyObject * ErisAccount_logout(PyErisAccount * self)
 {
-    if (self->connection == 0) {
+    if (self->account == 0) {
         PyErr_SetString(PyExc_AssertionError,
-                        "NULL connection in eris.Connection.send");
+                        "NULL account in eris.Account.logout");
         return NULL;
     }
 
-    // self->connection->send();
+    // self->account->logout();
 
     Py_INCREF(Py_None);
     return Py_None;
 }
 
-static PyMethodDef ErisConnection_methods[] = {
-    {"connect",		(PyCFunction)ErisConnection_connect,	METH_NOARGS },
-    {"disconnect",	(PyCFunction)ErisConnection_disconnect,	METH_NOARGS },
-    {"send",		(PyCFunction)ErisConnection_send,	METH_O },
+static PyMethodDef ErisAccount_methods[] = {
+    {"login",		(PyCFunction)ErisAccount_login,		METH_VARARGS },
+    {"createAccount",	(PyCFunction)ErisAccount_createAccount,	METH_VARARGS },
+    {"logout",		(PyCFunction)ErisAccount_logout,	METH_NOARGS },
     {NULL, NULL} // sentinel
 };
 
-static void ErisConnection_dealloc(PyErisConnection * self)
+static void ErisAccount_dealloc(PyErisAccount * self)
 {
-    if (self->connection != 0) {
-        delete self->connection;
+    if (self->account != 0) {
+        delete self->account;
     }
     self->ob_type->tp_free(self);
 }
 
-static PyObject * ErisConnection_getattr(PyErisConnection * self, char * name)
+static PyObject * ErisAccount_getattr(PyErisAccount * self, char * name)
 {
-    return Py_FindMethod(ErisConnection_methods, (PyObject *)self, name);
+    return Py_FindMethod(ErisAccount_methods, (PyObject *)self, name);
 }
 
-static int ErisConnection_cmp(PyErisConnection *self, PyObject * other)
+static int ErisAccount_cmp(PyErisAccount *self, PyObject * other)
 {
-    if (!PyErisConnection_Check(other)) {
+    if (!PyErisAccount_Check(other)) {
         return -1;
     }
-    PyErisConnection * other_con = (PyErisConnection *)other;
-    if (other_con->connection == self->connection) {
+    PyErisAccount * other_acc = (PyErisAccount *)other;
+    if (other_acc->account == self->account) {
         return 0;
     }
     return -1;
 }
 
-static PyObject * ErisConnection_new(PyTypeObject * type, 
-                                     PyObject *, PyObject *)
+static PyObject * ErisAccount_new(PyTypeObject * type, 
+                                  PyObject *, PyObject *)
 {
-    PyErisConnection * self = (PyErisConnection *)type->tp_alloc(type, 0);
-    self->connection = 0;
+    PyErisAccount * self = (PyErisAccount *)type->tp_alloc(type, 0);
+    self->account = 0;
     return (PyObject *)self;
 }
 
-static int ErisConnection_init(PyErisConnection * self, PyObject * args,
-                               PyObject * kwds)
+static int ErisAccount_init(PyErisAccount * self, PyObject * args,
+                            PyObject * kwds)
 {
-    self->connection = new Eris::Connection("", "", 6767, true);
+    PyObject * c;
+
+    if (!PyArg_ParseTuples(args, "O", &c)) {
+        return -1;
+    }
+
+    if (!PyErisConnection_Check(c)) {
+        PyErr_SetString(PyExc_TypeError, "Account requires a connection");
+        return -1;
+    }
+
+    PyErisConnection * connection = (PyErisConnection *)c;
+    self->account = new Eris::Account(connection->connection);
 
     return 0;
 }
 
-PyTypeObject PyErisConnection_Type = {
+PyTypeObject PyErisAccount_Type = {
         PyObject_HEAD_INIT(NULL)
         0,                                   // ob_size
-        "eris.Connection",                   // tp_name
-        sizeof(PyErisConnection),            // tp_basicsize
+        "eris.Account",                      // tp_name
+        sizeof(PyErisAccount),               // tp_basicsize
         0,                                   // tp_itemsize
         // methods
-        (destructor)ErisConnection_dealloc,  // tp_dealloc
+        (destructor)ErisAccount_dealloc,     // tp_dealloc
         0,                                   // tp_print
-        (getattrfunc)ErisConnection_getattr, // tp_getattr
+        (getattrfunc)ErisAccount_getattr,    // tp_getattr
         0,                                   // tp_setattr
-        (cmpfunc)ErisConnection_cmp,         // tp_compare
+        (cmpfunc)ErisAccount_cmp,            // tp_compare
         0,                                   // tp_repr
         0,                                   // tp_as_number
         0,                                   // tp_as_sequence
@@ -140,7 +152,7 @@ PyTypeObject PyErisConnection_Type = {
         0,                                   // tp_setattro
         0,                                   // tp_as_buffer
         Py_TPFLAGS_DEFAULT,                  // tp_flags
-        "Eris::Connection objects",          // tp_doc
+        "Eris::Account objects",             // tp_doc
         0,                                   // tp_travers
         0,                                   // tp_clear
         0,                                   // tp_richcompare
@@ -155,7 +167,7 @@ PyTypeObject PyErisConnection_Type = {
         0,                                   // tp_descr_get
         0,                                   // tp_descr_set
         0,                                   // tp_dictoffset
-        (initproc)ErisConnection_init,       // tp_init
+        (initproc)ErisAccount_init,          // tp_init
         0,                                   // tp_alloc
-        ErisConnection_new,                  // tp_new
+        ErisAccount_new,                     // tp_new
 };
