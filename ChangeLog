@@ -1,5 +1,15 @@
 2006-10-01  Al Riddoch  <alriddoch@zepler.org>
 
+	* PythonCallback.cpp, PythonCallback.h: New class to call python
+	  functions in response to sigc++ signals.
+
+	* eris_account.cpp, eris_connection.cpp: Implement the various
+	  callbacks required to track logging in.
+
+	* test.py: New script to test the bindings.
+
+2006-10-01  Al Riddoch  <alriddoch@zepler.org>
+
 	* eris_connection.cpp: Implement argument parsing for the constructor
 	  and start work on using setattr to install callbacks.
 

@@ -17,7 +17,12 @@
 
 #include "eris_connection.h"
 
+#include "PythonCallback.h"
+
 #include <Eris/Connection.h>
+
+#include <sigc++/bind_return.h>
+#include <sigc++/hide.h>
 
 static PyObject * ErisConnection_connect(PyErisConnection * self)
 {
@@ -92,26 +97,54 @@ static PyObject * ErisConnection_getattr(PyErisConnection * self, char * name)
 static int ErisConnection_setattr(PyErisConnection * self, char * name,
                                   PyObject * v)
 {
-    if (strcmp(name, "GotServerInfo") == 0) {
+    if (strcmp(name, "Connected") == 0) {
         if (!PyCallable_Check(v)) {
             PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
             return -1;
         }
         // Will need to be a template, or something. Possibly a number of
         // templates, one for each type we will need to wrap.
-        // PythonCallback * callback = new PythonCallback(v);
-        // self->connection->GotServerInfo.connect(sigc::mem_fun(*callback, &PythonCallback::call));
+        PythonCallback * callback = new PythonCallback(v);
+        self->connection->Connected.connect(sigc::mem_fun(*callback, &PythonCallback::call));
+        return 0;
+    }
+    if (strcmp(name, "Disconnected") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        PythonCallback * callback = new PythonCallback(v);
+        self->connection->Disconnected.connect(sigc::mem_fun(*callback, &PythonCallback::call));
         return 0;
     }
     if (strcmp(name, "Disconnecting") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        PythonCallback * callback = new PythonCallback(v);
+        self->connection->Disconnecting.connect(sigc::bind_return(sigc::mem_fun(*callback, &PythonCallback::call), true));
         return 0;
     }
     if (strcmp(name, "Failure") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        PythonCallback * callback = new PythonCallback(v);
+        self->connection->Failure.connect(sigc::hide(sigc::mem_fun(*callback, &PythonCallback::call)));
         return 0;
     }
     if (strcmp(name, "StatusChanged") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        PythonCallback * callback = new PythonCallback(v);
+        self->connection->StatusChanged.connect(sigc::hide(sigc::mem_fun(*callback, &PythonCallback::call)));
         return 0;
     }
+    std::cout << "NNO!" << std::endl << std::flush;
     PyErr_SetString(PyExc_AttributeError, "unknown attribute");
     return -1;
 }

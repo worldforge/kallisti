@@ -18,8 +18,14 @@
 #include "eris_account.h"
 
 #include "eris_connection.h"
+#include "PythonCallback.h"
 
 #include <Eris/Account.h>
+#include <Eris/Connection.h>
+
+#include <sigc++/hide.h>
+
+#include <iostream>
 
 static PyObject * ErisAccount_login(PyErisAccount * self, PyObject * args)
 {
@@ -35,6 +41,7 @@ static PyObject * ErisAccount_login(PyErisAccount * self, PyObject * args)
     }
 
     Eris::Result res = self->account->login(u, p);
+    std::cout << self->account->getConnection()->getStatus() << " " << res << " so there" << std::endl << std::flush;
     if (res == Eris::NOT_CONNECTED) {
         PyErr_SetString(PyExc_IOError, "Not connected");
         return NULL;
@@ -116,11 +123,29 @@ static PyObject * ErisAccount_getattr(PyErisAccount * self, char * name)
 
 static int ErisAccount_setattr(PyErisAccount * self, char * name, PyObject * v)
 {
-#if 0
-    if (strcmp(name, "StatusChanged") == 0) {
+    if (strcmp(name, "LoginSuccess") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback * callback = new PythonCallback(v);
+        self->account->LoginSuccess.connect(sigc::mem_fun(*callback, &PythonCallback::call));
         return 0;
     }
-#endif
+    if (strcmp(name, "LoginFailure") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback * callback = new PythonCallback(v);
+        self->account->LoginFailure.connect(sigc::hide(sigc::mem_fun(*callback, &PythonCallback::call)));
+        return 0;
+    }
+
     PyErr_SetString(PyExc_AttributeError, "unknown attribute");
     return -1;
 }

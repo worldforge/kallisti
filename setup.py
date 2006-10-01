@@ -19,6 +19,7 @@ atlas = Extension('atlas', sources=['atlas.cpp'], language='c++')
 eris = Extension('eris', sources=['eris_connection.cpp',
                                   'eris_account.cpp',
                                   'eris_polldefault.cpp',
+                                  'PythonCallback.cpp',
                                   'eris.cpp'],
                   include_dirs=eris_includes,
                   libraries=eris_libs,
