@@ -1,5 +1,9 @@
 2006-10-01  Al Riddoch  <alriddoch@zepler.org>
 
+	* eris_account.cpp: Start wrapping a bunch more methods.
+
+2006-10-01  Al Riddoch  <alriddoch@zepler.org>
+
 	* PythonCallback.cpp, PythonCallback.h: New class to call python
 	  functions in response to sigc++ signals.
 

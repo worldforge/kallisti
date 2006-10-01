@@ -56,3 +56,6 @@ if __name__ == "__main__":
     while is_logged == 0:
         eris.polldefault.poll()
 
+    for i in acc.getCharacterTypes():
+        print "Type: ", i
+

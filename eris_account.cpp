@@ -23,9 +23,29 @@
 #include <Eris/Account.h>
 #include <Eris/Connection.h>
 
+#include <Atlas/Objects/Entity.h>
+
 #include <sigc++/hide.h>
 
 #include <iostream>
+#include <map>
+
+static PyObject * erisResultAsPython(Eris::Result res)
+{
+    if (res == Eris::NOT_CONNECTED) {
+        PyErr_SetString(PyExc_IOError, "Not connected");
+        return NULL;
+    } else if (res == Eris::ALREADY_LOGGED_IN) {
+        PyErr_SetString(PyExc_IOError, "Already logged in");
+        return NULL;
+    } else if (res != Eris::NO_ERR) {
+        PyErr_SetString(PyExc_IOError, "Unknown Error");
+        return NULL;
+    }
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
 
 static PyObject * ErisAccount_login(PyErisAccount * self, PyObject * args)
 {
@@ -42,19 +62,7 @@ static PyObject * ErisAccount_login(PyErisAccount * self, PyObject * args)
 
     Eris::Result res = self->account->login(u, p);
     std::cout << self->account->getConnection()->getStatus() << " " << res << " so there" << std::endl << std::flush;
-    if (res == Eris::NOT_CONNECTED) {
-        PyErr_SetString(PyExc_IOError, "Not connected");
-        return NULL;
-    } else if (res == Eris::ALREADY_LOGGED_IN) {
-        PyErr_SetString(PyExc_IOError, "Already logged in");
-        return NULL;
-    } else if (res != Eris::NO_ERR) {
-        PyErr_SetString(PyExc_IOError, "Unknown Error");
-        return NULL;
-    }
-
-    Py_INCREF(Py_None);
-    return Py_None;
+    return erisResultAsPython(res);
 }
 
 static PyObject * ErisAccount_createAccount(PyErisAccount * self,
@@ -72,19 +80,7 @@ static PyObject * ErisAccount_createAccount(PyErisAccount * self,
     }
 
     Eris::Result res = self->account->createAccount(u, f, p);
-    if (res == Eris::NOT_CONNECTED) {
-        PyErr_SetString(PyExc_IOError, "Not connected");
-        return NULL;
-    } else if (res == Eris::ALREADY_LOGGED_IN) {
-        PyErr_SetString(PyExc_IOError, "Already logged in");
-        return NULL;
-    } else if (res != Eris::NO_ERR) {
-        PyErr_SetString(PyExc_IOError, "Unknown Error");
-        return NULL;
-    }
-
-    Py_INCREF(Py_None);
-    return Py_None;
+    return erisResultAsPython(res);
 }
 
 static PyObject * ErisAccount_logout(PyErisAccount * self)
@@ -95,16 +91,79 @@ static PyObject * ErisAccount_logout(PyErisAccount * self)
         return NULL;
     }
 
-    // self->account->logout();
+    self->account->logout();
 
     Py_INCREF(Py_None);
     return Py_None;
+}
+
+static PyObject * ErisAccount_getCharacterTypes(PyErisAccount * self)
+{
+    if (self->account == 0) {
+        PyErr_SetString(PyExc_AssertionError,
+                        "NULL account in eris.Account.getCharacterTypes");
+        return NULL;
+    }
+
+    const std::vector<std::string> & char_types = self->account->getCharacterTypes();
+    PyObject * ret_list = PyList_New(0);
+    std::vector<std::string>::const_iterator I = char_types.begin();
+    std::vector<std::string>::const_iterator Iend = char_types.end();
+    for (; I != Iend; ++I) {
+        PyObject * item = PyString_FromString(I->c_str());
+        PyList_Append(ret_list, item);
+        Py_DECREF(item);
+    }
+    return ret_list;
+}
+
+static PyObject * ErisAccount_getCharacters(PyErisAccount * self)
+{
+    if (self->account == 0) {
+        PyErr_SetString(PyExc_AssertionError,
+                        "NULL account in eris.Account.getCharacters");
+        return NULL;
+    }
+
+    const Eris::CharacterMap & characters = self->account->getCharacters();
+    PyObject * ret_list = PyList_New(0);
+    Eris::CharacterMap::const_iterator I = characters.begin();
+    Eris::CharacterMap::const_iterator Iend = characters.end();
+    for (; I != Iend; ++I) {
+        // FIXME need wrappers for atlas data
+        // PyObject * item = PyString_FromString(I->c_str());
+        // PyList_Append(ret_list, item);
+        // Py_DECREF(item);
+    }
+    return ret_list;
+}
+
+static PyObject * ErisAccount_takeCharacter(PyErisAccount * self,
+                                            PyObject * arg)
+{
+    if (self->account == 0) {
+        PyErr_SetString(PyExc_AssertionError,
+                        "NULL account in eris.Account.takeCharacter");
+        return NULL;
+    }
+
+    if (!PyString_Check(arg)) {
+        PyErr_SetString(PyExc_TypeError, "Character to take must be a string ID");
+        return NULL;
+    }
+
+    Eris::Result res = self->account->takeCharacter(PyString_AsString(arg));
+    return erisResultAsPython(res);
 }
 
 static PyMethodDef ErisAccount_methods[] = {
     {"login",		(PyCFunction)ErisAccount_login,		METH_VARARGS },
     {"createAccount",	(PyCFunction)ErisAccount_createAccount,	METH_VARARGS },
     {"logout",		(PyCFunction)ErisAccount_logout,	METH_NOARGS },
+    {"getCharacterTypes",(PyCFunction)ErisAccount_getCharacterTypes,	METH_NOARGS },
+    {"getCharacters",	(PyCFunction)ErisAccount_getCharacters,	METH_NOARGS },
+    {"takeCharacter",	(PyCFunction)ErisAccount_takeCharacter,	METH_O },
+    {"createCharacter",	(PyCFunction)ErisAccount_createCharacter,METH_O },
     {NULL, NULL} // sentinel
 };
 
