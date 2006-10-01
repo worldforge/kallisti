@@ -1,3 +1,17 @@
+2006-10-01  Al Riddoch  <alriddoch@zepler.org>
+
+	* eris_connection.cpp: Implement argument parsing for the constructor
+	  and start work on using setattr to install callbacks.
+
+	* eris_account.cpp: Implement arg parsing for all methods.
+
+	* eris.cpp, eris_polldefault.cpp, eris_polldefault.h: Add a new
+	  submodule for PollDefault, essential for working the connections
+	  usefully.
+
+	* Makefile: A minor convenience makefile, to get around the clumsy
+	  syntax of invoking setup.py.
+
 2006-09-29  Al Riddoch  <alriddoch@zepler.org>
 
 	* eris_account.h, eris_account.cpp: Start work on bindings for

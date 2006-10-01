@@ -16,6 +16,8 @@
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "eris_connection.h"
+#include "eris_account.h"
+#include "eris_polldefault.h"
 
 #include <iostream>
 
@@ -39,4 +41,17 @@ initeris()
         return;
     }
     PyModule_AddObject(eris, "Connection", (PyObject *)&PyErisConnection_Type);
+
+    if (PyType_Ready(&PyErisAccount_Type) < 0) {
+        // ????
+        return;
+    }
+    PyModule_AddObject(eris, "Account", (PyObject *)&PyErisAccount_Type);
+
+    PyObject * polldefault = Py_InitModule("polldefault", polldefault_methods);
+
+    if (polldefault == NULL) {
+        return;
+    }
+    PyModule_AddObject(eris, "polldefault", polldefault);
 }

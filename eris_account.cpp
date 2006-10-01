@@ -17,9 +17,11 @@
 
 #include "eris_account.h"
 
+#include "eris_connection.h"
+
 #include <Eris/Account.h>
 
-static PyObject * ErisAccount_login(PyErisAccount * self)
+static PyObject * ErisAccount_login(PyErisAccount * self, PyObject * args)
 {
     if (self->account == 0) {
         PyErr_SetString(PyExc_AssertionError,
@@ -27,9 +29,20 @@ static PyObject * ErisAccount_login(PyErisAccount * self)
         return NULL;
     }
 
-    if (self->account->login() != 0) {
-        PyErr_SetString(PyExc_IOError,
-                        "Unable to create socket");
+    char * u, * p;
+    if (!PyArg_ParseTuple(args, "ss", &u, &p)) {
+        return NULL;
+    }
+
+    Eris::Result res = self->account->login(u, p);
+    if (res == Eris::NOT_CONNECTED) {
+        PyErr_SetString(PyExc_IOError, "Not connected");
+        return NULL;
+    } else if (res == Eris::ALREADY_LOGGED_IN) {
+        PyErr_SetString(PyExc_IOError, "Already logged in");
+        return NULL;
+    } else if (res != Eris::NO_ERR) {
+        PyErr_SetString(PyExc_IOError, "Unknown Error");
         return NULL;
     }
 
@@ -37,7 +50,8 @@ static PyObject * ErisAccount_login(PyErisAccount * self)
     return Py_None;
 }
 
-static PyObject * ErisAccount_createAccount(PyErisAccount * self)
+static PyObject * ErisAccount_createAccount(PyErisAccount * self,
+                                            PyObject * args)
 {
     if (self->account == 0) {
         PyErr_SetString(PyExc_AssertionError,
@@ -45,9 +59,20 @@ static PyObject * ErisAccount_createAccount(PyErisAccount * self)
         return NULL;
     }
 
-    if (self->account->createAccount() != 0) {
-        PyErr_SetString(PyExc_IOError,
-                        "Unable to createAccount");
+    char * u, * f, * p;
+    if (!PyArg_ParseTuple(args, "sss", &u, &f, &p)) {
+        return NULL;
+    }
+
+    Eris::Result res = self->account->createAccount(u, f, p);
+    if (res == Eris::NOT_CONNECTED) {
+        PyErr_SetString(PyExc_IOError, "Not connected");
+        return NULL;
+    } else if (res == Eris::ALREADY_LOGGED_IN) {
+        PyErr_SetString(PyExc_IOError, "Already logged in");
+        return NULL;
+    } else if (res != Eris::NO_ERR) {
+        PyErr_SetString(PyExc_IOError, "Unknown Error");
         return NULL;
     }
 
@@ -89,6 +114,17 @@ static PyObject * ErisAccount_getattr(PyErisAccount * self, char * name)
     return Py_FindMethod(ErisAccount_methods, (PyObject *)self, name);
 }
 
+static int ErisAccount_setattr(PyErisAccount * self, char * name, PyObject * v)
+{
+#if 0
+    if (strcmp(name, "StatusChanged") == 0) {
+        return 0;
+    }
+#endif
+    PyErr_SetString(PyExc_AttributeError, "unknown attribute");
+    return -1;
+}
+
 static int ErisAccount_cmp(PyErisAccount *self, PyObject * other)
 {
     if (!PyErisAccount_Check(other)) {
@@ -114,14 +150,11 @@ static int ErisAccount_init(PyErisAccount * self, PyObject * args,
 {
     PyObject * c;
 
-    if (!PyArg_ParseTuples(args, "O", &c)) {
+    if (!PyArg_ParseTuple(args, "O!", &PyErisConnection_Type, &c)) {
         return -1;
     }
 
-    if (!PyErisConnection_Check(c)) {
-        PyErr_SetString(PyExc_TypeError, "Account requires a connection");
-        return -1;
-    }
+    assert(PyErisConnection_Check(c));
 
     PyErisConnection * connection = (PyErisConnection *)c;
     self->account = new Eris::Account(connection->connection);
@@ -139,7 +172,7 @@ PyTypeObject PyErisAccount_Type = {
         (destructor)ErisAccount_dealloc,     // tp_dealloc
         0,                                   // tp_print
         (getattrfunc)ErisAccount_getattr,    // tp_getattr
-        0,                                   // tp_setattr
+        (setattrfunc)ErisAccount_setattr,    // tp_setattr
         (cmpfunc)ErisAccount_cmp,            // tp_compare
         0,                                   // tp_repr
         0,                                   // tp_as_number

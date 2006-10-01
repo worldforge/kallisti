@@ -89,6 +89,33 @@ static PyObject * ErisConnection_getattr(PyErisConnection * self, char * name)
     return Py_FindMethod(ErisConnection_methods, (PyObject *)self, name);
 }
 
+static int ErisConnection_setattr(PyErisConnection * self, char * name,
+                                  PyObject * v)
+{
+    if (strcmp(name, "GotServerInfo") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        // PythonCallback * callback = new PythonCallback(v);
+        // self->connection->GotServerInfo.connect(sigc::mem_fun(*callback, &PythonCallback::call));
+        return 0;
+    }
+    if (strcmp(name, "Disconnecting") == 0) {
+        return 0;
+    }
+    if (strcmp(name, "Failure") == 0) {
+        return 0;
+    }
+    if (strcmp(name, "StatusChanged") == 0) {
+        return 0;
+    }
+    PyErr_SetString(PyExc_AttributeError, "unknown attribute");
+    return -1;
+}
+
 static int ErisConnection_cmp(PyErisConnection *self, PyObject * other)
 {
     if (!PyErisConnection_Check(other)) {
@@ -112,7 +139,13 @@ static PyObject * ErisConnection_new(PyTypeObject * type,
 static int ErisConnection_init(PyErisConnection * self, PyObject * args,
                                PyObject * kwds)
 {
-    self->connection = new Eris::Connection("", "", 6767, true);
+    char * client, * hostname;
+    int port, debug;
+
+    if (!PyArg_ParseTuple(args, "ssii", &client, &hostname, &port, &debug)) {
+        return -1;
+    }
+    self->connection = new Eris::Connection(client, hostname, port, debug);
 
     return 0;
 }
@@ -127,7 +160,7 @@ PyTypeObject PyErisConnection_Type = {
         (destructor)ErisConnection_dealloc,  // tp_dealloc
         0,                                   // tp_print
         (getattrfunc)ErisConnection_getattr, // tp_getattr
-        0,                                   // tp_setattr
+        (setattrfunc)ErisConnection_setattr, // tp_setattr
         (cmpfunc)ErisConnection_cmp,         // tp_compare
         0,                                   // tp_repr
         0,                                   // tp_as_number

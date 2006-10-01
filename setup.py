@@ -2,8 +2,7 @@ from distutils.core import setup, Extension
 import os
 
 def flags_to_names(flags, arg):
-    """Convert a string containing compiler flags into a list of include
-       directories. """
+    """Convert a string containing compiler flags into a list of filenames. """
     includes=[]
     for i in flags.split():
         if i[:2] == arg:
@@ -17,8 +16,10 @@ eris_link = os.popen('pkg-config --libs eris-1.3').read()
 eris_libs = flags_to_names(eris_link, '-l')
 
 atlas = Extension('atlas', sources=['atlas.cpp'], language='c++')
-eris = Extension('eris', sources=['eris.cpp',
-                                  'eris_connection.cpp'],
+eris = Extension('eris', sources=['eris_connection.cpp',
+                                  'eris_account.cpp',
+                                  'eris_polldefault.cpp',
+                                  'eris.cpp'],
                   include_dirs=eris_includes,
                   libraries=eris_libs,
                   language='c++')
