@@ -15,7 +15,9 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-#include "PythonCallback.h"
+#include "PythonCallback_impl.h"
+
+#include <Eris/Avatar.h>
 
 #include <iostream>
 
@@ -33,4 +35,17 @@ PythonCallback::~PythonCallback()
 void PythonCallback::call()
 {
     PyObject * ret = PyEval_CallFunction(m_callback, "()");
+
+
+    if (ret != NULL) {
+        Py_DECREF(ret);
+    }
+}
+
+template class PythonCallback1<Eris::Avatar>;
+
+template<>
+PyObject * wrap<Eris::Avatar>(Eris::Avatar *)
+{
+    return NULL;
 }

@@ -156,6 +156,23 @@ static PyObject * ErisAccount_takeCharacter(PyErisAccount * self,
     return erisResultAsPython(res);
 }
 
+static PyObject * ErisAccount_createCharacter(PyErisAccount * self,
+                                              PyObject * arg)
+{
+    if (self->account == 0) {
+        PyErr_SetString(PyExc_AssertionError,
+                        "NULL account in eris.Account.takeCharacter");
+        return NULL;
+    }
+
+    Atlas::Objects::Entity::RootEntity character; // FIXME Get the real one
+    character->setParents(std::list<std::string>(1, "settler"));
+    character->setName("Bob");
+
+    Eris::Result res = self->account->createCharacter(character);
+    return erisResultAsPython(res);
+}
+
 static PyMethodDef ErisAccount_methods[] = {
     {"login",		(PyCFunction)ErisAccount_login,		METH_VARARGS },
     {"createAccount",	(PyCFunction)ErisAccount_createAccount,	METH_VARARGS },
@@ -202,6 +219,39 @@ static int ErisAccount_setattr(PyErisAccount * self, char * name, PyObject * v)
         // templates, one for each type we will need to wrap.
         PythonCallback * callback = new PythonCallback(v);
         self->account->LoginFailure.connect(sigc::hide(sigc::mem_fun(*callback, &PythonCallback::call)));
+        return 0;
+    }
+    if (strcmp(name, "AvatarSuccess") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback1<Eris::Avatar> * callback = new PythonCallback1<Eris::Avatar>(v);
+        self->account->AvatarSuccess.connect(sigc::mem_fun(*callback, &PythonCallback1<Eris::Avatar>::callPtr));
+        return 0;
+    }
+    if (strcmp(name, "AvatarFailure") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback * callback = new PythonCallback(v);
+        self->account->AvatarFailure.connect(sigc::hide(sigc::mem_fun(*callback, &PythonCallback::call)));
+        return 0;
+    }
+    if (strcmp(name, "AvatarDeactivated") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback * callback = new PythonCallback(v);
+        self->account->AvatarDeactivated.connect(sigc::hide(sigc::mem_fun(*callback, &PythonCallback::call)));
         return 0;
     }
 

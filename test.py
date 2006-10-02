@@ -3,6 +3,7 @@ import eris
 
 is_connected = 0
 is_logged = 0
+is_ig = 0
 
 def connected():
     print "connected called"
@@ -29,6 +30,17 @@ def login_success():
 def login_failure():
     print "login_failure called"
 
+def avatar_success():
+    print "avatar_success called"
+    global is_ig
+    is_ig = 1
+
+def avatar_failure():
+    print "avatar_failure called"
+
+def avatar_deactivated():
+    print "avatar_deactivated called"
+
 if __name__ == "__main__":
 
     foo = eris.Connection("foo", "localhost", 6767, 1)
@@ -49,13 +61,22 @@ if __name__ == "__main__":
     acc = eris.Account(foo)
 
     acc.LoginSuccess = login_success
-    acc.LoginFailure = login_success
+    acc.LoginFailure = login_failure
 
     acc.login("ajr", "hel")
 
     while is_logged == 0:
         eris.polldefault.poll()
 
+    acc.AvatarSuccess = avatar_success
+    acc.AvatarFailure = avatar_failure
+    acc.AvatarDeactivated = avatar_deactivated
+
     for i in acc.getCharacterTypes():
         print "Type: ", i
+
+    acc.createCharacter("foo")
+
+    while not is_ig:
+        eris.polldefault.poll()
 

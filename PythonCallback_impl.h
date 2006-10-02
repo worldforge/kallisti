@@ -15,37 +15,39 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-#ifndef KALLISTI_PYTHONCALLBACK_H
-#define KALLISTI_PYTHONCALLBACK_H
-
-#include <Python.h>
-
-class PythonCallback {
-  protected:
-    PyObject * m_callback;
-  public:
-    explicit PythonCallback(PyObject * callable);
-    ~PythonCallback();
-
-    void call();
-};
+#include "PythonCallback.h"
 
 template <class T>
-PyObject * wrap(T *);
+PythonCallback1<T>::PythonCallback1(PyObject * callable) :
+                                       m_callback(callable)
+{
+    Py_INCREF(m_callback);
+}
 
 template <class T>
-PyObject * wrap(T &);
+PythonCallback1<T>::~PythonCallback1()
+{
+}
+
+// FIXME Destructor must DECREF.
+
 
 template <class T>
-class PythonCallback1 {
-  protected:
-    PyObject * m_callback;
-  public:
-    explicit PythonCallback1(PyObject * callable);
-    ~PythonCallback1();
+void PythonCallback1<T>::callPtr(T * t)
+{
+    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t));
 
-    void callPtr(T *);
-    void call(T &);
-};
+    if (ret != NULL) {
+        Py_DECREF(ret);
+    }
+}
 
-#endif // KALLISTI_PYTHONCALLBACK_H
+template <class T>
+void PythonCallback1<T>::call(T & t)
+{
+    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t));
+
+    if (ret != NULL) {
+        Py_DECREF(ret);
+    }
+}
