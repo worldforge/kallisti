@@ -1,5 +1,13 @@
 2006-10-02  Al Riddoch  <alriddoch@zepler.org>
 
+	* PythonCallback.cpp, PythonCallback_impl.h, PythonCallback.h:
+	  Implement wrap() for references, and rename the pointer wrapper
+	  template to wrapPtr().
+
+	* setup.py: Add necessary handling for library directories for eris.
+
+2006-10-02  Al Riddoch  <alriddoch@zepler.org>
+
 	* PythonCallback_impl.h, PythonCallback.cpp, PythonCallback.h:
 	  Add templates for handling callback arguments.
 

@@ -14,6 +14,7 @@ eris_includes = flags_to_names(eris_cflags, '-I')
 
 eris_link = os.popen('pkg-config --libs eris-1.3').read()
 eris_libs = flags_to_names(eris_link, '-l')
+eris_libdirs = flags_to_names(eris_link, '-L')
 
 atlas = Extension('atlas', sources=['atlas.cpp'], language='c++')
 eris = Extension('eris', sources=['eris_connection.cpp',
@@ -22,6 +23,7 @@ eris = Extension('eris', sources=['eris_connection.cpp',
                                   'PythonCallback.cpp',
                                   'eris.cpp'],
                   include_dirs=eris_includes,
+		  library_dirs=eris_libdirs,
                   libraries=eris_libs,
                   language='c++')
 

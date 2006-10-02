@@ -35,7 +35,7 @@ PythonCallback1<T>::~PythonCallback1()
 template <class T>
 void PythonCallback1<T>::callPtr(T * t)
 {
-    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t));
+    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrapPtr(t));
 
     if (ret != NULL) {
         Py_DECREF(ret);

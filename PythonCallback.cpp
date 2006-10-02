@@ -45,7 +45,13 @@ void PythonCallback::call()
 template class PythonCallback1<Eris::Avatar>;
 
 template<>
-PyObject * wrap<Eris::Avatar>(Eris::Avatar *)
+PyObject * wrapPtr<Eris::Avatar>(Eris::Avatar *)
+{
+    return NULL;
+}
+
+template<>
+PyObject * wrap<Eris::Avatar>(Eris::Avatar & )
 {
     return NULL;
 }

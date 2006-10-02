@@ -31,7 +31,7 @@ class PythonCallback {
 };
 
 template <class T>
-PyObject * wrap(T *);
+PyObject * wrapPtr(T *);
 
 template <class T>
 PyObject * wrap(T &);
