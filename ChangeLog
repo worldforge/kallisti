@@ -1,4 +1,4 @@
-2006-10-01  Al Riddoch  <alriddoch@zepler.org>
+2006-10-02  Al Riddoch  <alriddoch@zepler.org>
 
 	* PythonCallback_impl.h, PythonCallback.cpp, PythonCallback.h:
 	  Add templates for handling callback arguments.
