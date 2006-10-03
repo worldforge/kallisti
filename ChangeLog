@@ -1,5 +1,13 @@
 2006-10-03  Al Riddoch  <alriddoch@zepler.org>
 
+	* eris_view.cpp, PythonCallback.cpp: Return NULL in stub function to
+	  prevent warnings.
+
+	* PythonCallback_impl.h: Specialise wrap explicitly so it uses
+	  the right kind of reference.
+
+2006-10-03  Al Riddoch  <alriddoch@zepler.org>
+
 	* eris_entity.cpp, eris_entity.h: New wrappers for Eris::Entity.
 
 	* PythonCallback.cpp, PythonCallback_impl.h, PythonCallback.h:

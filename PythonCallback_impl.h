@@ -37,7 +37,7 @@ PythonCallback1<T>::~PythonCallback1()
 template <class T>
 void PythonCallback1<T>::call(T t)
 {
-    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t));
+    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap<T>(t));
 
     if (ret != NULL) {
         Py_DECREF(ret);
@@ -64,7 +64,7 @@ PythonCallback2<T, U>::~PythonCallback2()
 template <typename T, typename U>
 void PythonCallback2<T, U>::call(T t, U u)
 {
-    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t), wrap(u));
+    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap<T>(t), wrap<U>(u));
 
     if (ret != NULL) {
         Py_DECREF(ret);

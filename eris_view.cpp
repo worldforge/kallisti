@@ -27,6 +27,8 @@ static PyObject * ErisView_method(PyErisView * self)
                         "NULL view in eris.View.method");
         return NULL;
     }
+
+    return NULL;
 }
 
 static PyMethodDef ErisView_methods[] = {

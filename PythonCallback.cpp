@@ -68,13 +68,14 @@ PyObject * wrap<Eris::Entity *>(Eris::Entity * en)
 }
 
 template<>
-PyObject * wrap<const Atlas::Objects::Operation::RootOperation &>(const Atlas::Objects::Operation::RootOperation & op)
+PyObject * wrap<const Atlas::Objects::Operation::RootOperation &>(const Atlas::Objects::Operation::RootOperation &)
 {
     // PyErisEntity * pen = newPyErisEntity();
 
     // pen->entity = en;
 
     // return (PyObject *)pen;
+    return NULL;
 }
 
 template class PythonCallback1<Eris::Avatar *>;
