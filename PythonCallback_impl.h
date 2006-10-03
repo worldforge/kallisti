@@ -17,6 +17,8 @@
 
 #include "PythonCallback.h"
 
+#include <iostream>
+
 template <class T>
 PythonCallback1<T>::PythonCallback1(PyObject * callable) :
                                        m_callback(callable)
@@ -33,21 +35,40 @@ PythonCallback1<T>::~PythonCallback1()
 
 
 template <class T>
-void PythonCallback1<T>::callPtr(T * t)
-{
-    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrapPtr(t));
-
-    if (ret != NULL) {
-        Py_DECREF(ret);
-    }
-}
-
-template <class T>
-void PythonCallback1<T>::call(T & t)
+void PythonCallback1<T>::call(T t)
 {
     PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t));
 
     if (ret != NULL) {
         Py_DECREF(ret);
+    } else {
+        std::cout << "BOOM" << std::endl << std::flush;
+    }
+}
+
+template <typename T, typename U>
+PythonCallback2<T, U>::PythonCallback2(PyObject * callable) :
+                                       m_callback(callable)
+{
+    Py_INCREF(m_callback);
+}
+
+template <typename T, typename U>
+PythonCallback2<T, U>::~PythonCallback2()
+{
+}
+
+// FIXME Destructor must DECREF.
+
+
+template <typename T, typename U>
+void PythonCallback2<T, U>::call(T t, U u)
+{
+    PyObject * ret = PyEval_CallFunction(m_callback, "(O)", wrap(t), wrap(u));
+
+    if (ret != NULL) {
+        Py_DECREF(ret);
+    } else {
+        std::cout << "BOOM" << std::endl << std::flush;
     }
 }

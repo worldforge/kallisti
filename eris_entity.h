@@ -15,47 +15,25 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-#ifndef KALLISTI_PYTHONCALLBACK_H
-#define KALLISTI_PYTHONCALLBACK_H
+#ifndef KALLISTI_ERIS_ENTITY_H
+#define KALLISTI_ERIS_ENTITY_H
 
 #include <Python.h>
 
-class PythonCallback {
-  protected:
-    PyObject * m_callback;
-  public:
-    explicit PythonCallback(PyObject * callable);
-    ~PythonCallback();
+namespace Eris {
+  class Entity;
+}
 
-    void call();
-};
+typedef struct {
+    PyObject_HEAD
+    Eris::Entity * entity;
+} PyErisEntity;
 
-template <typename T>
-PyObject * wrap(T);
+extern PyTypeObject PyErisEntity_Type;
 
-template <typename T>
-class PythonCallback1 {
-  protected:
-    PyObject * m_callback;
-  public:
-    explicit PythonCallback1(PyObject * callable);
-    ~PythonCallback1();
+// FIXME Is this legal any more?
+#define PyErisEntity_Check(_o) ((_o)->ob_type == &PyErisEntity_Type)
 
-    void call(T);
-};
+PyErisEntity * newPyErisEntity();
 
-template <typename T, typename U>
-class PythonCallback2 {
-  protected:
-    PyObject * m_callback;
-  public:
-    explicit PythonCallback2(PyObject * callable);
-    ~PythonCallback2();
-
-    // void callPtrs(T *, U *);
-    void call(T, U);
-    // void callPtr2(T &, U *);
-    // void call(T &, U &);
-};
-
-#endif // KALLISTI_PYTHONCALLBACK_H
+#endif // KALLISTI_ERIS_ENTITY_H

@@ -19,6 +19,7 @@
 #include "eris_avatar.h"
 
 #include "eris_view.h"
+#include "PythonCallback.h"
 
 #include <Eris/Avatar.h>
 
@@ -32,20 +33,20 @@ static PyObject * ErisAvatar_getView(PyErisAvatar * self)
 
     Eris::View * view = self->avatar->getView();
     if (view == NULL) {
-	PyErr_SetString(PyExc_RuntimeError,
-			"No view available yet");
-	return NULL;
+        PyErr_SetString(PyExc_RuntimeError,
+                        "No view available yet");
+        return NULL;
     }
     PyErisView * view_wrap = newPyErisView();
     if (view_wrap == NULL) {
-	return NULL;
+        return NULL;
     }
     view_wrap->view = view;
     return (PyObject *)view_wrap;
 }
 
 static PyMethodDef ErisAvatar_methods[] = {
-    {"getView",		(PyCFunction)ErisAvatar_getView,	METH_VARARGS },
+    {"getView",                (PyCFunction)ErisAvatar_getView,        METH_VARARGS },
     {NULL, NULL} // sentinel
 };
 
@@ -65,6 +66,51 @@ static PyObject * ErisAvatar_getattr(PyErisAvatar * self, char * name)
 
 static int ErisAvatar_setattr(PyErisAvatar * self, char * name, PyObject * v)
 {
+    if (strcmp(name, "GotCharacterEntity") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback1<Eris::Entity *> * callback = new PythonCallback1<Eris::Entity *>(v);
+        self->avatar->GotCharacterEntity.connect(sigc::mem_fun(*callback, &PythonCallback1<Eris::Entity *>::call));
+        return 0;
+    }
+    if (strcmp(name, "InvAdded") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback1<Eris::Entity *> * callback = new PythonCallback1<Eris::Entity *>(v);
+        self->avatar->InvAdded.connect(sigc::mem_fun(*callback, &PythonCallback1<Eris::Entity *>::call));
+        return 0;
+    }
+    if (strcmp(name, "InvRemoved") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        PythonCallback1<Eris::Entity *> * callback = new PythonCallback1<Eris::Entity *>(v);
+        self->avatar->InvRemoved.connect(sigc::mem_fun(*callback, &PythonCallback1<Eris::Entity *>::call));
+        return 0;
+    }
+    if (strcmp(name, "Hear") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        // Will need to be a template, or something. Possibly a number of
+        // templates, one for each type we will need to wrap.
+        // PythonCallback2<Eris::Entity *, const Atlas::Objects::Operation::RootOperation &> * callback = new PythonCallback2<Eris::Entity *, const Atlas::Objects::Operation::RootOperation &>(v);
+        // self->avatar->Hear.connect(sigc::mem_fun(*callback, &PythonCallback2<Eris::Entity *, const Atlas::Objects::Operation::RootOperation &>::call));
+        return 0;
+    }
+
     PyErr_SetString(PyExc_AttributeError, "unknown attribute");
     return -1;
 }
@@ -144,7 +190,7 @@ PyErisAvatar * newPyErisAvatar()
     PyErisAvatar * self;
     self = PyObject_NEW(PyErisAvatar, &PyErisAvatar_Type);
     if (self == NULL) {
-	return NULL;
+        return NULL;
     }
     return self;
 }

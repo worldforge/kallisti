@@ -228,8 +228,8 @@ static int ErisAccount_setattr(PyErisAccount * self, char * name, PyObject * v)
         }
         // Will need to be a template, or something. Possibly a number of
         // templates, one for each type we will need to wrap.
-        PythonCallback1<Eris::Avatar> * callback = new PythonCallback1<Eris::Avatar>(v);
-        self->account->AvatarSuccess.connect(sigc::mem_fun(*callback, &PythonCallback1<Eris::Avatar>::callPtr));
+        PythonCallback1<Eris::Avatar *> * callback = new PythonCallback1<Eris::Avatar *>(v);
+        self->account->AvatarSuccess.connect(sigc::mem_fun(*callback, &PythonCallback1<Eris::Avatar *>::call));
         return 0;
     }
     if (strcmp(name, "AvatarFailure") == 0) {

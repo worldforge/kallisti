@@ -18,8 +18,11 @@
 #include "PythonCallback_impl.h"
 
 #include "eris_avatar.h"
+#include "eris_entity.h"
 
 #include <Eris/Avatar.h>
+
+#include <Atlas/Objects/RootOperation.h>
 
 #include <iostream>
 
@@ -44,10 +47,8 @@ void PythonCallback::call()
     }
 }
 
-template class PythonCallback1<Eris::Avatar>;
-
 template<>
-PyObject * wrapPtr<Eris::Avatar>(Eris::Avatar * av)
+PyObject * wrap<Eris::Avatar *>(Eris::Avatar * av)
 {
     PyErisAvatar * pav = newPyErisAvatar();
 
@@ -57,7 +58,33 @@ PyObject * wrapPtr<Eris::Avatar>(Eris::Avatar * av)
 }
 
 template<>
-PyObject * wrap<Eris::Avatar>(Eris::Avatar & )
+PyObject * wrap<Eris::Entity *>(Eris::Entity * en)
+{
+    PyErisEntity * pen = newPyErisEntity();
+
+    pen->entity = en;
+
+    return (PyObject *)pen;
+}
+
+template<>
+PyObject * wrap<const Atlas::Objects::Operation::RootOperation &>(const Atlas::Objects::Operation::RootOperation & op)
+{
+    // PyErisEntity * pen = newPyErisEntity();
+
+    // pen->entity = en;
+
+    // return (PyObject *)pen;
+}
+
+template class PythonCallback1<Eris::Avatar *>;
+template class PythonCallback1<Eris::Entity *>;
+template class PythonCallback2<Eris::Entity *, const Atlas::Objects::Operation::RootOperation &>;
+
+#if 0
+template<>
+PyObject * wrap<Eris::Avatar &>(Eris::Avatar & )
 {
     return NULL;
 }
+#endif

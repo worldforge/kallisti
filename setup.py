@@ -21,11 +21,12 @@ eris = Extension('eris', sources=['eris_connection.cpp',
                                   'eris_account.cpp',
                                   'eris_avatar.cpp',
                                   'eris_view.cpp',
+                                  'eris_entity.cpp',
                                   'eris_polldefault.cpp',
                                   'PythonCallback.cpp',
                                   'eris.cpp'],
                   include_dirs=eris_includes,
-		  library_dirs=eris_libdirs,
+                  library_dirs=eris_libdirs,
                   libraries=eris_libs,
                   language='c++')
 

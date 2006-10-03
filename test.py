@@ -30,10 +30,15 @@ def login_success():
 def login_failure():
     print "login_failure called"
 
-def avatar_success():
+got_avatar=None
+
+def avatar_success(avatar):
     print "avatar_success called"
+    print avatar
     global is_ig
+    global got_avatar
     is_ig = 1
+    got_avatar = avatar
 
 def avatar_failure():
     print "avatar_failure called"
@@ -80,3 +85,6 @@ if __name__ == "__main__":
     while not is_ig:
         eris.polldefault.poll()
 
+    view = got_avatar.getView()
+
+    print view

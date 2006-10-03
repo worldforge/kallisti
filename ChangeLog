@@ -1,3 +1,16 @@
+2006-10-03  Al Riddoch  <alriddoch@zepler.org>
+
+	* eris_entity.cpp, eris_entity.h: New wrappers for Eris::Entity.
+
+	* PythonCallback.cpp, PythonCallback_impl.h, PythonCallback.h:
+	  Rework the callback and wrapper templates to be simpler,
+	  specialise for more types, and add a callback template for two
+	  arguments.
+
+	* eris_account.cpp: Use improved callback templates.
+
+	* eris_avatar.cpp: Add callbacks.
+
 2006-10-02  Al Riddoch  <alriddoch@zepler.org>
 
 	* eris.cpp, eris_avatar.cpp, eris_avatar.h, eris_view.cpp,
