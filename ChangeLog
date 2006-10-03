@@ -1,5 +1,9 @@
 2006-10-03  Al Riddoch  <alriddoch@zepler.org>
 
+	* eris_connection.cpp: Add support for ServerInfo method and callback.
+
+2006-10-03  Al Riddoch  <alriddoch@zepler.org>
+
 	* eris_view.cpp, PythonCallback.cpp: Return NULL in stub function to
 	  prevent warnings.
 

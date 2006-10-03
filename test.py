@@ -4,6 +4,7 @@ import eris
 is_connected = 0
 is_logged = 0
 is_ig = 0
+has_server_info = 0
 
 def connected():
     print "connected called"
@@ -12,6 +13,11 @@ def connected():
 
 def disconnected():
     print "disconnected called"
+
+def gotServerInfo():
+    print "gotServerInfo called"
+    global has_server_info
+    has_server_info = 1
 
 def disconnecting():
     print "disconnecting called"
@@ -52,6 +58,7 @@ if __name__ == "__main__":
 
     foo.Connected = connected
     foo.Disconnected = disconnected
+    foo.GotServerInfo = gotServerInfo
     foo.Disconnecting = disconnecting
     foo.Failure = failure
     foo.StatusChanged = status_changed
@@ -62,6 +69,13 @@ if __name__ == "__main__":
         eris.polldefault.poll()
 
     print "Okay"
+
+    foo.refreshServerInfo()
+
+    while has_server_info == 0:
+        eris.polldefault.poll()
+
+    print foo.getServerInfo()
 
     acc = eris.Account(foo)
 

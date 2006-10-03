@@ -74,10 +74,50 @@ static PyObject * ErisConnection_send(PyErisConnection * self)
     return Py_None;
 }
 
+static PyObject * ErisConnection_refreshServerInfo(PyErisConnection * self)
+{
+    if (self->connection == 0) {
+        PyErr_SetString(PyExc_AssertionError,
+                        "NULL connection in eris.Connection.refreshServerInfo");
+        return NULL;
+    }
+
+    self->connection->refreshServerInfo();
+
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyObject * ErisConnection_getServerInfo(PyErisConnection * self)
+{
+    if (self->connection == 0) {
+        PyErr_SetString(PyExc_AssertionError,
+                        "NULL connection in eris.Connection.getServerInfo");
+        return NULL;
+    }
+
+    Eris::ServerInfo sinfo;
+    self->connection->getServerInfo(sinfo);
+
+    PyObject * ret_dict = PyDict_New();
+    PyDict_SetItemString(ret_dict, "hostname", PyString_FromString(sinfo.getHostname().c_str()));
+    PyDict_SetItemString(ret_dict, "servername", PyString_FromString(sinfo.getServername().c_str()));
+    PyDict_SetItemString(ret_dict, "ruleset", PyString_FromString(sinfo.getRuleset().c_str()));
+    PyDict_SetItemString(ret_dict, "server", PyString_FromString(sinfo.getServer().c_str()));
+    PyDict_SetItemString(ret_dict, "version", PyString_FromString(sinfo.getVersion().c_str()));
+    PyDict_SetItemString(ret_dict, "builddate", PyString_FromString(sinfo.getBuildDate().c_str()));
+    PyDict_SetItemString(ret_dict, "num_clients", PyInt_FromLong(sinfo.getNumClients()));
+    PyDict_SetItemString(ret_dict, "uptime", PyFloat_FromDouble(sinfo.getUptime()));
+
+    return ret_dict;
+}
+
 static PyMethodDef ErisConnection_methods[] = {
     {"connect",		(PyCFunction)ErisConnection_connect,	METH_NOARGS },
     {"disconnect",	(PyCFunction)ErisConnection_disconnect,	METH_NOARGS },
     {"send",		(PyCFunction)ErisConnection_send,	METH_O },
+    {"refreshServerInfo",(PyCFunction)ErisConnection_refreshServerInfo,METH_NOARGS },
+    {"getServerInfo",	(PyCFunction)ErisConnection_getServerInfo,METH_NOARGS },
     {NULL, NULL} // sentinel
 };
 
@@ -115,6 +155,15 @@ static int ErisConnection_setattr(PyErisConnection * self, char * name,
         }
         PythonCallback * callback = new PythonCallback(v);
         self->connection->Disconnected.connect(sigc::mem_fun(*callback, &PythonCallback::call));
+        return 0;
+    }
+    if (strcmp(name, "GotServerInfo") == 0) {
+        if (!PyCallable_Check(v)) {
+            PyErr_SetString(PyExc_TypeError, "Callback requires a callable");
+            return -1;
+        }
+        PythonCallback * callback = new PythonCallback(v);
+        self->connection->GotServerInfo.connect(sigc::mem_fun(*callback, &PythonCallback::call));
         return 0;
     }
     if (strcmp(name, "Disconnecting") == 0) {
