@@ -15,49 +15,25 @@
 // along with this program; if not, write to the Free Software Foundation,
 // Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-#include "PythonCallback_impl.h"
+#ifndef KALLISTI_ERIS_AVATAR_H
+#define KALLISTI_ERIS_AVATAR_H
 
-#include "eris_avatar.h"
+#include <Python.h>
 
-#include <Eris/Avatar.h>
-
-#include <iostream>
-
-PythonCallback::PythonCallback(PyObject * callable) : m_callback(callable)
-{
-    Py_INCREF(m_callback);
+namespace Eris {
+  class Avatar;
 }
 
-PythonCallback::~PythonCallback()
-{
-}
+typedef struct {
+    PyObject_HEAD
+    Eris::Avatar * avatar;
+} PyErisAvatar;
 
-// FIXME Destructor must DECREF.
+extern PyTypeObject PyErisAvatar_Type;
 
-void PythonCallback::call()
-{
-    PyObject * ret = PyEval_CallFunction(m_callback, "()");
+// FIXME Is this legal any more?
+#define PyErisAvatar_Check(_o) ((_o)->ob_type == &PyErisAvatar_Type)
 
+PyErisAvatar * newPyErisAvatar();
 
-    if (ret != NULL) {
-        Py_DECREF(ret);
-    }
-}
-
-template class PythonCallback1<Eris::Avatar>;
-
-template<>
-PyObject * wrapPtr<Eris::Avatar>(Eris::Avatar * av)
-{
-    PyErisAvatar * pav = newPyErisAvatar();
-
-    pav->avatar = av;
-
-    return (PyObject *)pav;
-}
-
-template<>
-PyObject * wrap<Eris::Avatar>(Eris::Avatar & )
-{
-    return NULL;
-}
+#endif // KALLISTI_ERIS_AVATAR_H

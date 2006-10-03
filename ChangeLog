@@ -1,5 +1,17 @@
 2006-10-02  Al Riddoch  <alriddoch@zepler.org>
 
+	* eris.cpp, eris_avatar.cpp, eris_avatar.h, eris_view.cpp,
+	  eris_view.cpp: Add new wrapper types for Eris::View and
+	  Eris::Avatar.
+
+	* PythonCallback.cpp: Add a specialisation for the wrapPtr
+	  template that wraps Eris::Avatar.
+
+	* wrapper_template.cpp: Example code to be used to create new
+	  wrappers.
+
+2006-10-02  Al Riddoch  <alriddoch@zepler.org>
+
 	* PythonCallback.cpp, PythonCallback_impl.h, PythonCallback.h:
 	  Implement wrap() for references, and rename the pointer wrapper
 	  template to wrapPtr().

@@ -19,6 +19,8 @@ eris_libdirs = flags_to_names(eris_link, '-L')
 atlas = Extension('atlas', sources=['atlas.cpp'], language='c++')
 eris = Extension('eris', sources=['eris_connection.cpp',
                                   'eris_account.cpp',
+                                  'eris_avatar.cpp',
+                                  'eris_view.cpp',
                                   'eris_polldefault.cpp',
                                   'PythonCallback.cpp',
                                   'eris.cpp'],

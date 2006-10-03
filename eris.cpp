@@ -17,6 +17,8 @@
 
 #include "eris_connection.h"
 #include "eris_account.h"
+#include "eris_avatar.h"
+#include "eris_view.h"
 #include "eris_polldefault.h"
 
 #include <iostream>
@@ -47,6 +49,18 @@ initeris()
         return;
     }
     PyModule_AddObject(eris, "Account", (PyObject *)&PyErisAccount_Type);
+
+    if (PyType_Ready(&PyErisAvatar_Type) < 0) {
+        // ????
+        return;
+    }
+    PyModule_AddObject(eris, "Avatar", (PyObject *)&PyErisAvatar_Type);
+
+    if (PyType_Ready(&PyErisView_Type) < 0) {
+        // ????
+        return;
+    }
+    PyModule_AddObject(eris, "View", (PyObject *)&PyErisView_Type);
 
     PyObject * polldefault = Py_InitModule("polldefault", polldefault_methods);
 
