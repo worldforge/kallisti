@@ -21,7 +21,16 @@
 #include "eris_view.h"
 #include "eris_polldefault.h"
 
+#include <Eris/Log.h>
+
+#include <sigc++/functors/functors.h>
+
 #include <iostream>
+
+void log_output(Eris::LogLevel lvl, const std::string &msg)
+{
+    std::cout << "[ErisLog] " << msg << std::endl << std::flush;
+}
 
 static PyMethodDef no_methods[] = {
     {NULL,          NULL}                       /* Sentinel */
@@ -68,4 +77,8 @@ initeris()
         return;
     }
     PyModule_AddObject(eris, "polldefault", polldefault);
+
+    std::cout << " Set up " << std::endl << std::flush;
+    Eris::setLogLevel(Eris::LOG_DEBUG);
+    Eris::Logged.connect(sigc::ptr_fun(&log_output));
 }

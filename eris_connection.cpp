@@ -101,7 +101,7 @@ static PyObject * ErisConnection_getServerInfo(PyErisConnection * self)
 
     PyObject * ret_dict = PyDict_New();
     PyDict_SetItemString(ret_dict, "hostname", PyString_FromString(sinfo.getHostname().c_str()));
-    PyDict_SetItemString(ret_dict, "servername", PyString_FromString(sinfo.getServername().c_str()));
+    PyDict_SetItemString(ret_dict, "name", PyString_FromString(sinfo.getServername().c_str()));
     PyDict_SetItemString(ret_dict, "ruleset", PyString_FromString(sinfo.getRuleset().c_str()));
     PyDict_SetItemString(ret_dict, "server", PyString_FromString(sinfo.getServer().c_str()));
     PyDict_SetItemString(ret_dict, "version", PyString_FromString(sinfo.getVersion().c_str()));

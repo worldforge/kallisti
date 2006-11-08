@@ -1,0 +1,45 @@
+<html>
+<head>
+</head>
+<body>
+<%
+import eris
+import sys
+
+# sys.path.append(".")
+
+req.write("FOO")
+
+done = 0
+
+def connected():
+    con.refreshServerInfo()
+
+def server_info():
+    data = con.getServerInfo()
+    req.write('<table>')
+    for k in data.keys():
+        req.write('<tr><td>'+k+'</td><td>'+str(data[k])+'</td></td>')
+    req.write('</table>')
+    global done
+    done = 1
+
+def disconnected():
+    global done
+    done = 1
+
+con = eris.Connection("kallisti", "localhost", 6767, 1)
+
+con.Connected = connected
+con.GotServerInfo = server_info
+con.Disconnected = disconnected
+con.Failure = disconnected
+
+con.connect()
+
+while not done:
+    eris.polldefault.poll()
+
+%>
+</body>
+</html>
