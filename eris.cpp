@@ -37,11 +37,11 @@ static PyMethodDef no_methods[] = {
 };
 
 PyMODINIT_FUNC
-initeris()
+initkallistieris()
 {
     std::cout << "WAH" << std::endl << std::flush;
 
-    PyObject * eris = Py_InitModule("eris", no_methods);
+    PyObject * eris = Py_InitModule("kallistieris", no_methods);
 
     if (eris == NULL) {
         return;

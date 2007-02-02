@@ -87,6 +87,15 @@ if __name__ == "__main__":
     while is_logged == 0:
         eris.polldefault.poll()
 
+    has_server_info = 0
+
+    foo.refreshServerInfo()
+
+    while has_server_info == 0:
+        eris.polldefault.poll()
+
+    print foo.getServerInfo()
+
     acc.AvatarSuccess = avatar_success
     acc.AvatarFailure = avatar_failure
     acc.AvatarDeactivated = avatar_deactivated

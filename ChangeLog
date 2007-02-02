@@ -1,3 +1,9 @@
+2007-02-02  Al Riddoch  <alriddoch@zepler.org>
+
+	* setup.py, eris.cpp: Rename modules to avoid conflicts.
+
+	* test.py: Add testing for more stuff.
+
 2006-11-08  Al Riddoch  <alriddoch@zepler.org>
 
 	* eris_connection.cpp: Fix servername to name as its know in the

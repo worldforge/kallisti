@@ -16,8 +16,8 @@ eris_link = os.popen('pkg-config --libs eris-1.3').read()
 eris_libs = flags_to_names(eris_link, '-l')
 eris_libdirs = flags_to_names(eris_link, '-L')
 
-atlas = Extension('atlas', sources=['atlas.cpp'], language='c++')
-eris = Extension('eris', sources=['eris_connection.cpp',
+atlas = Extension('kallistiatlas', sources=['atlas.cpp'], language='c++')
+eris = Extension('kallistieris', sources=['eris_connection.cpp',
                                   'eris_account.cpp',
                                   'eris_avatar.cpp',
                                   'eris_view.cpp',
