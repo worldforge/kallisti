@@ -39,8 +39,6 @@ static PyMethodDef no_methods[] = {
 PyMODINIT_FUNC
 initkallistieris()
 {
-    std::cout << "WAH" << std::endl << std::flush;
-
     PyObject * eris = Py_InitModule("kallistieris", no_methods);
 
     if (eris == NULL) {
@@ -76,9 +74,10 @@ initkallistieris()
     if (polldefault == NULL) {
         return;
     }
+    // We have a borrowed reference, and PyModule_AddObject steals a reference
+    Py_INCREF(polldefault);
     PyModule_AddObject(eris, "polldefault", polldefault);
 
-    std::cout << " Set up " << std::endl << std::flush;
     Eris::setLogLevel(Eris::LOG_DEBUG);
     Eris::Logged.connect(sigc::ptr_fun(&log_output));
 }
