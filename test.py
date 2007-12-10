@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-import eris
+#!/usr/bin/python
+from kallisti import eris
 
 is_connected = 0
 is_logged = 0

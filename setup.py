@@ -16,15 +16,14 @@ eris_link = os.popen('pkg-config --libs eris-1.3').read()
 eris_libs = flags_to_names(eris_link, '-l')
 eris_libdirs = flags_to_names(eris_link, '-L')
 
-atlas = Extension('kallistiatlas', sources=['atlas.cpp'], language='c++')
-eris = Extension('kallistieris', sources=['eris_connection.cpp',
-                                  'eris_account.cpp',
-                                  'eris_avatar.cpp',
-                                  'eris_view.cpp',
-                                  'eris_entity.cpp',
-                                  'eris_polldefault.cpp',
-                                  'PythonCallback.cpp',
-                                  'eris.cpp'],
+eris = Extension('kallisti', sources=['eris_connection.cpp',
+                                      'eris_account.cpp',
+                                      'eris_avatar.cpp',
+                                      'eris_view.cpp',
+                                      'eris_entity.cpp',
+                                      'eris_polldefault.cpp',
+                                      'PythonCallback.cpp',
+                                      'kallisti.cpp'],
                   include_dirs=eris_includes,
                   library_dirs=eris_libdirs,
                   libraries=eris_libs,
@@ -40,5 +39,5 @@ setup (name = 'Kallisti',
 This package contains a number of modules which wrap the core WorldForge C++
 libraries required to build usable components of the WorldForge system.
 """,
-       ext_modules = [atlas, eris])
+       ext_modules = [eris])
        
