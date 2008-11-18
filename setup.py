@@ -33,7 +33,7 @@ setup (name = 'Kallisti',
        version = '0.0.0',
        description = 'Wrapper for WorldForge C++ libraries',
        author = 'Alistair Riddoch',
-       author_email = 'alriddoch@worldforge.org',
+       author_email = 'alriddoch@googlemail.com',
        url = 'http://www.worldforge.org/dev/eng/libraries/',
        long_description = """
 This package contains a number of modules which wrap the core WorldForge C++
